@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sternsingen – Rain am Lech</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,Segoe UI,sans-serif;color:#202923;background:#f4f6f3}header{background:#203d2b;color:white;padding:16px clamp(14px,3vw,36px);display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}h1{font-size:clamp(1.25rem,3vw,1.8rem);margin:0}header p{margin:3px 0 0;color:#dce9df}nav{display:flex;gap:8px}button,select,input{font:inherit}button{border:0;border-radius:9px;padding:10px 14px;background:#276b43;color:#fff;cursor:pointer;font-weight:650}button:hover{filter:brightness(1.08)}nav button{background:#42614d}nav button.active{background:#fff;color:#203d2b}main{max-width:1200px;margin:auto;padding:18px}h2{font-size:1.2rem;margin:20px 0 10px}.intro,.toolbar{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap;margin:8px 0 12px}.intro span,.small{color:#59665c;font-size:.92rem}#map{height:min(62vh,620px);min-height:350px;border:1px solid #ccd5ce;border-radius:14px;z-index:0}.toolbar{background:white;padding:10px;border-radius:10px}.toolbar label{display:flex;gap:8px;align-items:center}select,input{width:100%;padding:10px;border:1px solid #cbd5cd;border-radius:8px;background:#fff}label{display:grid;gap:6px;margin:12px 0}.areas{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}.area-card,.panel,.notice{background:white;border:1px solid #dbe2dc;border-radius:12px;padding:14px}.area-card h3{margin:0 0 8px;display:flex;gap:8px;align-items:center}.swatch{width:14px;height:14px;border-radius:4px;display:inline-block;flex-shrink:0}.address-row{padding:9px 0;border-top:1px solid #edf0ed;display:flex;justify-content:space-between;gap:10px;align-items:flex-start}.address-row small{display:block;color:#657167}.address-row button{padding:5px 8px;font-size:.8rem}.admin-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}.panel h2{margin-top:0}.notice{margin-bottom:14px;border-left:5px solid #d49a22}.notice p{margin-bottom:0}.secondary{background:#59665c;margin-top:8px}.danger{background:#a53d32;margin:8px 0}.small{line-height:1.45}.import-label{display:inline-grid;background:#e9eee9;padding:9px;border-radius:8px;margin:8px;cursor:pointer}.import-label input{margin-top:5px}footer{text-align:center;color:#637066;padding:20px;font-size:.85rem}[hidden]{display:none!important}@media(max-width:600px){main{padding:10px}header{align-items:flex-start}nav{width:100%}nav button{flex:1}#map{min-height:330px}.intro{align-items:flex-start;flex-direction:column}}
+</style>
+</head>
+<body>
+<header><div><h1>Sternsingen · Rain am Lech</h1><p>Gebiete, Häuser und Adressen</p></div><nav><button id="publicTab" class="active">Karte & Adressen</button><button id="adminTab">Verwaltung</button></nav></header>
+<main>
+<section id="publicView">
+  <div class="intro"><strong>Übersicht für die Sternsinger</strong><span>Standort über das Ortungssymbol aktivieren.</span></div>
+  <div id="map"></div>
+  <div class="toolbar"><button id="locate">◎ Meinen Standort zeigen</button><label>Gebiet anzeigen <select id="filter"><option value="all">Alle Gebiete</option></select></label></div>
+  <h2>Adressen nach Gebiet</h2><div id="publicAddresses" class="areas"></div>
+</section>
+<section id="adminView" hidden>
+  <div class="notice"><strong>Verwaltung</strong><p>Dies ist zunächst eine lokale Demo. Vor dem Einsatz auf mehreren Handys muss die gemeinsame Datenbank eingerichtet werden. Ohne Datenbank werden Änderungen nur in diesem Browser gespeichert.</p></div>
+  <div class="admin-grid">
+    <form id="addressForm" class="panel">
+      <h2>Haus / Adresse hinzufügen</h2>
+      <label>Adresse<input id="address" required placeholder="z. B. Musterstraße 12"></label>
+      <label>Gebiet<select id="areaSelect"></select></label>
+      <label>Notiz (optional)<input id="note" placeholder="z. B. klingeln bei Familie …"></label>
+      <button type="submit">Adresse speichern</button>
+      <p class="small">Die Adresse wird als Eintrag gespeichert. Für die genaue Kartenposition kannst du anschließend auf die Karte klicken und den Eintrag dort platzieren.</p>
+    </form>
+    <div class="panel">
+      <h2>Gebiet / Straßenkarte bearbeiten</h2>
+      <label>Aktives Gebiet<select id="drawArea"></select></label>
+      <p>Aktiviere „Straßenlinie zeichnen“, wähle ein Gebiet und klicke entlang der betreffenden Straße auf die Karte. So kannst du die Linien anhand deines Plans nach und nach verbessern.</p>
+      <button id="drawMode">Straßenlinie zeichnen: AUS</button>
+      <button id="clearLines" class="secondary">Alle selbst gezeichneten Linien löschen</button>
+      <p class="small">Die farbigen Linien sind eine bearbeitbare Annäherung, keine bereits verifizierte exakte Zuordnung jeder Straße. Nutze den Kartenzoom zum präzisen Zeichnen.</p>
+    </div>
+  </div>
+  <h2>Gespeicherte Adressen</h2><div id="adminAddresses" class="areas"></div>
+  <div class="panel"><button id="export">Daten exportieren (JSON)</button><label class="import-label">Daten importieren (JSON)<input id="importFile" type="file" accept="application/json"></label><button id="reset" class="danger">Demo-Daten zurücksetzen</button></div>
+</section>
+</main>
+<footer>Vorlage für Rain am Lech · Kartenmaterial © OpenStreetMap-Mitwirkende</footer>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="app.js"></script>
+</body></html>
